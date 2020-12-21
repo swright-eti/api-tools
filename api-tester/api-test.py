@@ -10,7 +10,8 @@ parser.add_argument("org_label")
 args = parser.parse_args()
 
 
-base_url = args.base_url
+protocol = "http"
+base_url = protocol + "://" + args.base_url
 username = args.username
 org = args.org_label
 
@@ -21,7 +22,7 @@ token = None
 def get_token():
     headers = {'Content-Type': 'application/json', 'accept': 'application/json'}
     api_url = base_url + "/auth-api/auth"
-    print("Getting token from:" + api_url)
+    print("Getting token from " + api_url)
     args={"username":username,"password":password,"org":org}
     response = requests.post(api_url, headers=headers, json=args)
 
