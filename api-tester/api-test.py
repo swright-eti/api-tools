@@ -7,7 +7,7 @@ import sys
 #
 # Setup the parser
 #
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='A program to test API endpoints')
 parser.add_argument("base_url", help="The base URL to call, or kubefwd to use locally forwarded services")
 parser.add_argument("username", help="Triad username")
 parser.add_argument("org_label", help="The ORG label")
