@@ -3,14 +3,15 @@ import requests
 import argparse
 import getpass
 import re
+import sys
 #
 # Setup the parser
 #
 parser = argparse.ArgumentParser()
-parser.add_argument("base_url", help="The base URL to call")
+parser.add_argument("base_url", help="The base URL to call, or kubefwd to use locally forwarded services")
 parser.add_argument("username", help="Triad username")
 parser.add_argument("org_label", help="The ORG label")
-parser.add_argument('-e', '--endpoints', nargs="*", help="A space separated list of REST endpoints to append to the URL")
+parser.add_argument('-e', '--endpoints', nargs="*", help="A space separated list of REST endpoints to append to the URL. Cannot be used with kubefwd")
 
 args = parser.parse_args()
 #
@@ -20,6 +21,12 @@ protocol = "http"
 base_url = args.base_url
 username = args.username
 org = args.org_label
+
+if args.endpoints and args.base_url == 'kubefwd':
+    print("")
+    print("baseurl of 'kubefwd' and -e [endpoints] are mutually exclusive.")
+    print("")
+    sys.exit()
 
 #
 # Do the special to get the password prompt
