@@ -36,13 +36,13 @@ if args.endpoints and args.base_url == 'kubefwd':
 
 if args.iterations <= 0:
     print("")
-    print("You want me to run " + str(arg.iterations) + "? Dont be silly!")
+    print("You want me to run " + str(args.iterations) + "? Dont be silly!")
     print("")
     sys.exit()
 
 if args.iterations > 500:
     print("")
-    print("You want me to run " + str(arg.iterations) + "? Some people just want to watch the world burn! Well here we go")
+    print("You want me to run " + str(args.iterations) + "? Some people just want to watch the world burn! Well here we go")
     print("")     
 
 #
