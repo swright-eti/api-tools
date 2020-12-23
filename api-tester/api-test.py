@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import json
 import requests
 import argparse
@@ -11,22 +13,37 @@ parser = argparse.ArgumentParser(description='A program to test API endpoints')
 parser.add_argument("base_url", help="The base URL to call, or kubefwd to use locally forwarded services")
 parser.add_argument("username", help="Triad username")
 parser.add_argument("org_label", help="The ORG label")
+parser.add_argument('-i', '--iterations', nargs="?", const=1, type=int, help="How many times to iterate the requests. Defaults to 1")
 parser.add_argument('-e', '--endpoints', nargs="*", help="A space separated list of REST endpoints to append to the URL. Cannot be used with kubefwd")
 
 args = parser.parse_args()
 #
 # Setup the program arguments
 # 
+
 protocol = "http"
 base_url = args.base_url
 username = args.username
 org = args.org_label
+
+response_codes = {}
 
 if args.endpoints and args.base_url == 'kubefwd':
     print("")
     print("baseurl of 'kubefwd' and -e [endpoints] are mutually exclusive.")
     print("")
     sys.exit()
+
+if args.iterations <= 0:
+    print("")
+    print("You want me to run " + str(arg.iterations) + "? Dont be silly!")
+    print("")
+    sys.exit()
+
+if args.iterations > 500:
+    print("")
+    print("You want me to run " + str(arg.iterations) + "? Some people just want to watch the world burn! Well here we go")
+    print("")     
 
 #
 # Do the special to get the password prompt
@@ -49,6 +66,7 @@ def get_token(endpoint):
     else:
         print(response)
         return None
+    
 
 # 
 # Call the given REST endpoint with the provided token and return an object count
@@ -59,9 +77,11 @@ def call_rest_endpoint(endpoint, token):
 
     if response.status_code == 200:
         response_obj =  json.loads(response.content.decode('utf-8'))
+        increment_response_codes(response.status_code)
         print("Found " + str(response_obj['page']['totalElements']) + " objects for the endpoint " + endpoint)
     else:
         print("Resonse code: " + str(response.status_code) + " for " + endpoint)
+        increment_response_codes(response.status_code)
         return None
 #
 # If using kubefwd then this function will extract all the service names from the /etc/hosts file
@@ -109,6 +129,16 @@ def build_endpoint_dict():
         endpoints["auth-api"] = protocol + '://' + base_url + "/auth-api/auth"
 
     return endpoints
+#
+# Add the status code if its not in the array, increment its counter
+#
+def increment_response_codes(status_code):
+    if status_code not in response_codes.keys():
+        response_codes[status_code] = 0
+
+    response_codes[status_code] = response_codes[status_code] + 1
+        
+
 
 #
 # The program
@@ -121,14 +151,20 @@ if len(endpoints) > 0 :
     if(token is None):
         print("No token found, cannot continue")
     else:
-        for api in endpoints:
-            if api != "auth-api":
-                call_rest_endpoint(endpoints[api], token)
+        for i in range(args.iterations):
+            print("")
+            print("Iteration:" + str(i + 1))
+            
+            for api in endpoints:
+                if api != "auth-api":
+                    call_rest_endpoint(endpoints[api], token)
 else:
     print("No endpoints specified, nothing to do")
 
-
-
+print("")
+print("HTTP response code counts for each query")
+for status in response_codes:
+    print(str(status) + ": " + str(response_codes[status]))
 
 
 
