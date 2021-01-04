@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(description='A program to test API endpoints')
 parser.add_argument("base_url", help="The base URL to call, or kubefwd to use locally forwarded services")
 parser.add_argument("username", help="Triad username")
 parser.add_argument("org_label", help="The ORG label")
-parser.add_argument('-i', '--iterations', nargs="?", const=1, type=int, help="How many times to iterate the requests. Defaults to 1")
+parser.add_argument('-i', '--iterations', nargs="?", default=1, type=int, help="How many times to iterate the requests. Defaults to 1")
 parser.add_argument('-e', '--endpoints', nargs="*", help="A space separated list of REST endpoints to append to the URL. Cannot be used with kubefwd")
 
 args = parser.parse_args()
