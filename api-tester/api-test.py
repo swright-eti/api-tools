@@ -14,7 +14,7 @@ parser.add_argument("base_url", help="The base URL to call, or kubefwd to use lo
 parser.add_argument("username", help="Triad username")
 parser.add_argument("org_label", help="The ORG label")
 parser.add_argument('-i', '--iterations', nargs="?", default=1, type=int, help="How many times to iterate the requests. Defaults to 1")
-parser.add_argument('-e', '--endpoints', nargs="*", help="A space separated list of REST endpoints to append to the URL. Cannot be used with kubefwd")
+parser.add_argument('-e', '--endpoints', nargs="*", help="A space separated list of REST endpoints (device-api/v1/devices) to append to the URL. Cannot be used with kubefwd")
 
 args = parser.parse_args()
 #
@@ -74,7 +74,7 @@ def get_token(endpoint):
 def call_rest_endpoint(endpoint, token):
     headers = {'Authorization': 'Bearer ' + token, 'accept': 'application/hal+json'}
     response = requests.get(endpoint, headers=headers)
-
+    print(endpoint)
     if response.status_code == 200:
         response_obj =  json.loads(response.content.decode('utf-8'))
         increment_response_codes(response.status_code)
@@ -113,9 +113,10 @@ def build_endpoint_dict():
     else:
         if(args.endpoints):
             for endpoint in args.endpoints:
-                res = re.search(r'^\/(\w+-\w+)', endpoint)
+                res = re.search(r'^(\w+-\w+)', endpoint)
+                
                 if res:
-                    endpoints[res.group(1)] = protocol + '://' + base_url + endpoint
+                    endpoints[res.group(1)] = protocol + '://' + base_url + '/' + endpoint
         else:
             endpoints = {
             "device-api" : protocol + '://' + base_url + "/device-api/v1/devices",
